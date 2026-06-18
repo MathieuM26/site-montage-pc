@@ -390,7 +390,7 @@
               transparent, sans surprise.
             </p>
             <div class="price-big"><span class="amount text-gradient-neon">100€</span><span class="muted">/ montage complet</span></div>
-            <a href="mailto:m26.informatique@gmail.com" class="btn btn-primary shadow-neon" style="margin-top:2rem;">Réserver mon montage <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+            <a href="mailto:m26.informatique@gmail.com" data-montage="1" class="btn btn-primary shadow-neon" style="margin-top:2rem;">Réserver mon montage <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
             <p class="muted" style="margin-top:1rem;font-size:0.875rem;">Ou par téléphone : <a href="tel:+32478466196" class="text-primary">0478&nbsp;46&nbsp;61&nbsp;96</a> · du lundi au vendredi, 10h–18h</p>
           </div>
           <ul class="features">
@@ -514,6 +514,40 @@
             encodeURIComponent(body);
         });
       });
+
+      // "Réserver mon montage" → email pré-rempli pour le forfait montage (100 €).
+      const montageLink = document.querySelector("a[data-montage]");
+      if (montageLink) {
+        montageLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const subject = "Réservation montage PC (100 €)";
+          const body =
+            "Bonjour M26 INFORMATIQUE,\n\n" +
+            "Je souhaite réserver le montage de mon PC (forfait 100 €).\n\n" +
+            "Mes composants à assembler :\n" +
+            "- Processeur :\n" +
+            "- Carte mère :\n" +
+            "- Carte graphique :\n" +
+            "- Mémoire (RAM) :\n" +
+            "- Stockage :\n" +
+            "- Alimentation :\n" +
+            "- Refroidissement :\n" +
+            "- Boîtier :\n\n" +
+            "Options :\n" +
+            "- Installation Windows 11 : oui / non\n" +
+            "- Mise à jour BIOS + profil XMP/EXPO : oui / non\n\n" +
+            "Mes coordonnées :\n" +
+            "Nom / Prénom :\n" +
+            "Téléphone :\n" +
+            "Disponibilité souhaitée :\n\n" +
+            "Merci !";
+          window.location.href =
+            "mailto:m26.informatique@gmail.com?subject=" +
+            encodeURIComponent(subject) +
+            "&body=" +
+            encodeURIComponent(body);
+        });
+      }
     </script>
   </body>
 </html>
