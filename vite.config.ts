@@ -6,16 +6,21 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// The site is served from the GitHub Pages project sub-path
+// https://<user>.github.io/site-montage-pc/ — every layer (Vite assets,
+// TanStack router, Nitro prerender) must agree on this prefix.
+// Overridable via BASE_PATH for other hosts (e.g. "/" for a root domain).
+const BASE = process.env.BASE_PATH ?? "/site-montage-pc/";
+
 export default defineConfig({
   vite: {
-    // The site is served from the GitHub Pages sub-path
-    // https://<user>.github.io/site-montage-pc/ so all asset URLs must be
-    // prefixed with it. Overridable via BASE_PATH for other hosts.
-    base: process.env.BASE_PATH ?? "/site-montage-pc/",
+    base: BASE,
   },
   // Force-enable the Nitro build outside the Lovable environment and target
   // GitHub Pages (static output in .output/public, with .nojekyll + 404.html).
-  nitro: { preset: "github_pages" },
+  // baseURL keeps Nitro's prerenderer requesting routes under the sub-path so
+  // they match the router's basepath instead of 404-ing.
+  nitro: { preset: "github_pages", baseURL: BASE },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
