@@ -26,9 +26,9 @@ export default defineConfig({
     preset: "github_pages",
     prerender: { routes: [BASE], crawlLinks: false },
   },
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-  },
+  // NOTE: intentionally NOT overriding tanstackStart.server.entry. Lovable's
+  // src/server.ts wrapper only routes correctly inside Lovable's Cloudflare
+  // runtime; outside it the SSR handler 404s every route, producing empty
+  // prerender output. Using TanStack Start's default (route-aware) server
+  // entry lets the prerenderer render real HTML.
 });
