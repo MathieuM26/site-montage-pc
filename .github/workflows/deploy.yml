@@ -37,9 +37,19 @@ jobs:
         # static site to .output/public before Nitro's (unneeded for a static
         # site) production server build fails — so don't let that fail the job.
         run: npm run build || echo "::warning::build exited non-zero (likely the unused Nitro server step); continuing"
-        # No NITRO_PRESET here: a static preset has no SSR handler, so the
-        # prerender 404s. The default (node) preset renders pages; we only ship
-        # the prerendered .output/public and ignore the server bundle.
+        env:
+          # DIAGNOSTIC: build at root to test whether the app prerenders at all,
+          # isolating the question from the sub-path/basepath handling.
+          BASE_PATH: "/"
+
+      - name: Diagnose generated routes
+        run: |
+          echo "=== generated routeTree.gen.* ==="
+          find . -path ./node_modules -prune -o -name 'routeTree.gen.*' -print -exec head -60 {} \;
+          echo "=== .output/public tree ==="
+          find .output/public -type f -exec ls -l {} \; 2>/dev/null | sort -k9
+          echo "=== index (first 1500 chars) ==="
+          { head -c 1500 .output/public/index 2>/dev/null || head -c 1500 .output/public/index.html 2>/dev/null; } || echo "(no index found)"
 
       - name: Prepare static output for Pages
         run: |
