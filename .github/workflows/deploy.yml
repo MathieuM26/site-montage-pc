@@ -45,17 +45,20 @@ jobs:
       - name: Prepare static output for Pages
         run: |
           cd .output/public
-          # Nitro writes the prerendered root route as "index" (no extension);
-          # GitHub Pages serves directories via index.html, so rename it.
-          if [ -f index ] && [ ! -f index.html ]; then mv index index.html; fi
-          # Fail loudly if the prerender produced no page.
-          test -f index.html
+          echo "=== output tree ==="; find . -type f -exec ls -l {} \; | sort -k9
+          # SPA mode emits the client-rendered shell; normalize whatever it is
+          # called (index, _shell.html, ...) into index.html for GitHub Pages.
+          if [ ! -f index.html ]; then
+            if [ -f index ]; then mv index index.html;
+            elif [ -f _shell.html ]; then cp _shell.html index.html; fi
+          fi
+          # Fail loudly (with a non-empty check) if no usable shell was produced.
+          test -s index.html
           # SPA-style fallback so deep links / refreshes don't 404.
           cp index.html 404.html
           # Tell GitHub Pages not to run the output through Jekyll.
           touch .nojekyll
-          echo "=== final tree ==="; find . -type f | sort
-          echo "=== index.html (first 1200 chars) ==="; head -c 1200 index.html
+          echo "=== index.html (first 1500 chars) ==="; head -c 1500 index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
