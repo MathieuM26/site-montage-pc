@@ -16,14 +16,14 @@ export default defineConfig({
   vite: {
     base: BASE,
   },
-  // Force-enable the Nitro build outside the Lovable environment and target
-  // GitHub Pages (static output in .output/public).
-  // Nitro mounts the app AT baseURL and redirects everything else to it, so we
-  // must prerender the baseURL path itself (requesting "/" only yields an empty
-  // redirect body). With the request hitting BASE, the router (basepath BASE)
-  // matches the index route and renders real HTML to .output/public/index.
+  // Force-enable the Nitro build outside the Lovable environment.
+  // IMPORTANT: do NOT use a static preset (github_pages/static) here — those
+  // ship only a static file server with no SSR handler, so the prerenderer has
+  // nothing to render and every route 404s. The default (node) preset includes
+  // the SSR handler, letting the prerenderer render real HTML into
+  // .output/public. Nitro mounts the app at baseURL and redirects other paths
+  // to it, so prerender the baseURL path itself.
   nitro: {
-    preset: "github_pages",
     baseURL: BASE,
     prerender: { routes: [BASE], crawlLinks: false },
   },

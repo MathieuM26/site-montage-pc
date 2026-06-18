@@ -37,10 +37,9 @@ jobs:
         # static site to .output/public before Nitro's (unneeded for a static
         # site) production server build fails — so don't let that fail the job.
         run: npm run build || echo "::warning::build exited non-zero (likely the unused Nitro server step); continuing"
-        env:
-          # Nitro preset that emits a static site (.output/public) with
-          # .nojekyll and a 404.html fallback, ready for GitHub Pages.
-          NITRO_PRESET: github_pages
+        # No NITRO_PRESET here: a static preset has no SSR handler, so the
+        # prerender 404s. The default (node) preset renders pages; we only ship
+        # the prerendered .output/public and ignore the server bundle.
 
       - name: Prepare static output for Pages
         run: |
