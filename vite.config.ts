@@ -13,6 +13,9 @@ export default defineConfig({
     // prefixed with it. Overridable via BASE_PATH for other hosts.
     base: process.env.BASE_PATH ?? "/site-montage-pc/",
   },
+  // Force-enable the Nitro build outside the Lovable environment and target
+  // GitHub Pages (static output in .output/public, with .nojekyll + 404.html).
+  nitro: { preset: "github_pages" },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
