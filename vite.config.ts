@@ -24,6 +24,10 @@ export default defineConfig({
   // .output/public. Nitro mounts the app at baseURL and redirects other paths
   // to it, so prerender the baseURL path itself.
   nitro: {
+    // Explicit Node preset: the Lovable default is cloudflare-module (a Workers
+    // bundle the prerenderer can't execute → 404s). node-server produces a
+    // server the prerenderer can actually run to render real HTML.
+    preset: "node-server",
     baseURL: BASE,
     prerender: { routes: [BASE], crawlLinks: false },
   },
