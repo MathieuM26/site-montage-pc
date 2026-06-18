@@ -11,78 +11,30 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the
-# run in-progress and latest queued.
+# Allow only one concurrent deployment.
 concurrency:
   group: pages
   cancel-in-progress: true
 
+# The site is a plain static page in site/ — no build step needed.
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build static site
-        # The client/ssr builds and prerender all complete and write the
-        # static site to .output/public before Nitro's (unneeded for a static
-        # site) production server build fails — so don't let that fail the job.
-        run: npm run build || echo "::warning::build exited non-zero (likely the unused Nitro server step); continuing"
-        env:
-          # DIAGNOSTIC: build at root to test whether the app prerenders at all,
-          # isolating the question from the sub-path/basepath handling.
-          BASE_PATH: "/"
-
-      - name: Diagnose generated routes
-        run: |
-          echo "=== generated routeTree.gen.* ==="
-          find . -path ./node_modules -prune -o -name 'routeTree.gen.*' -print -exec head -60 {} \;
-          echo "=== .output/public tree ==="
-          find .output/public -type f -exec ls -l {} \; 2>/dev/null | sort -k9
-          echo "=== index (first 1500 chars) ==="
-          { head -c 1500 .output/public/index 2>/dev/null || head -c 1500 .output/public/index.html 2>/dev/null; } || echo "(no index found)"
-
-      - name: Prepare static output for Pages
-        run: |
-          cd .output/public
-          echo "=== output tree ==="; find . -type f -exec ls -l {} \; | sort -k9
-          # The page is prerendered under the sub-path dir; hoist it to root so
-          # GitHub Pages serves it at https://<user>.github.io/site-montage-pc/.
-          if [ -f site-montage-pc/index.html ]; then
-            mv -f site-montage-pc/index.html index.html
-            rm -rf site-montage-pc
-          elif [ ! -f index.html ] && [ -f index ]; then
-            mv index index.html
-          fi
-          # Fail loudly (with a non-empty check) if no usable page was produced.
-          test -s index.html
-          # SPA-style fallback so deep links / refreshes don't 404.
-          cp index.html 404.html
-          # Tell GitHub Pages not to run the output through Jekyll.
-          touch .nojekyll
-          echo "=== index.html (first 1500 chars) ==="; head -c 1500 index.html
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .output/public
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
