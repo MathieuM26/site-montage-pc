@@ -42,12 +42,20 @@ jobs:
           # .nojekyll and a 404.html fallback, ready for GitHub Pages.
           NITRO_PRESET: github_pages
 
-      - name: Inspect build output
+      - name: Prepare static output for Pages
         run: |
-          echo "=== .output/public tree ==="
-          find .output/public -type f | sort
-          echo "=== sanity: at least one .html must exist ==="
-          test -n "$(find .output/public -name '*.html' -print -quit)"
+          cd .output/public
+          # Nitro writes the prerendered root route as "index" (no extension);
+          # GitHub Pages serves directories via index.html, so rename it.
+          if [ -f index ] && [ ! -f index.html ]; then mv index index.html; fi
+          # Fail loudly if the prerender produced no page.
+          test -f index.html
+          # SPA-style fallback so deep links / refreshes don't 404.
+          cp index.html 404.html
+          # Tell GitHub Pages not to run the output through Jekyll.
+          touch .nojekyll
+          echo "=== final tree ==="; find . -type f | sort
+          echo "=== index.html (first 1200 chars) ==="; head -c 1200 index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
