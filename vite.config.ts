@@ -7,9 +7,22 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    // The site is served from the GitHub Pages sub-path
+    // https://<user>.github.io/site-montage-pc/ so all asset URLs must be
+    // prefixed with it. Overridable via BASE_PATH for other hosts.
+    base: process.env.BASE_PATH ?? "/site-montage-pc/",
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    // Prerender routes to static HTML so the site can be hosted on GitHub
+    // Pages, which serves static files only (no Node server at runtime).
+    prerender: {
+      enabled: true,
+      crawlLinks: true,
+    },
+    pages: [{ path: "/", prerender: { enabled: true } }],
   },
 });
