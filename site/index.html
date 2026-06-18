@@ -311,7 +311,7 @@
               <div class="price-row">
                 <div><div class="from">À partir de</div><div class="price">999 €</div></div>
               </div>
-              <a href="#montage" class="btn-block secondary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+              <a href="mailto:m26.informatique@gmail.com" data-config="starter" class="btn-block secondary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
             </footer>
           </article>
 
@@ -341,7 +341,7 @@
               <div class="price-row">
                 <div><div class="from">À partir de</div><div class="price">2 299 €</div></div>
               </div>
-              <a href="#montage" class="btn-block primary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+              <a href="mailto:m26.informatique@gmail.com" data-config="apex" class="btn-block primary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
             </footer>
           </article>
 
@@ -370,7 +370,7 @@
               <div class="price-row">
                 <div><div class="from">À partir de</div><div class="price">3 599 €</div></div>
               </div>
-              <a href="#montage" class="btn-block secondary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+              <a href="mailto:m26.informatique@gmail.com" data-config="titan" class="btn-block secondary">Commander cette config <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
             </footer>
           </article>
         </div>
@@ -448,6 +448,72 @@
 
     <script>
       document.getElementById("year").textContent = "© " + new Date().getFullYear();
+
+      // "Commander cette config" → ouvre l'email pré-rempli avec la config choisie.
+      const CONFIGS = {
+        starter: {
+          name: "Starter",
+          price: "999 €",
+          specs: [
+            "Processeur : AMD Ryzen 5 7600",
+            "Carte mère : MSI B650M PRO",
+            "Carte graphique : RTX 5060 8 Go",
+            "Mémoire : 16 Go DDR5",
+            "Stockage : 1 To NVMe",
+            "Alimentation : 650W 80+ Gold",
+            "Refroidissement : AIO 240mm",
+            "Boîtier : MSI MAG FORGE 120A AIRFLOW",
+          ],
+        },
+        apex: {
+          name: "Apex",
+          price: "2 299 €",
+          specs: [
+            "Processeur : AMD Ryzen 7 7800X3D",
+            "Carte mère : ASUS TUF B650-Plus WiFi",
+            "Carte graphique : RTX 5070 Ti",
+            "Mémoire : 32 Go DDR5",
+            "Stockage : 2 To NVMe",
+            "Alimentation : 850W 80+ Gold",
+            "Refroidissement : AIO 360mm",
+            "Boîtier : Lian Li Lancool 216",
+          ],
+        },
+        titan: {
+          name: "Titan",
+          price: "3 599 €",
+          specs: [
+            "Processeur : AMD Ryzen 7 9800X3D",
+            "Carte mère : ASUS ROG Strix X870-E",
+            "Carte graphique : RTX 5080",
+            "Mémoire : 64 Go DDR5",
+            "Stockage : 2× 2 To NVMe",
+            "Alimentation : 1000W 80+ Platinum",
+            "Refroidissement : AIO 360mm",
+            "Boîtier : Fractal North XL",
+          ],
+        },
+      };
+
+      document.querySelectorAll("a[data-config]").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const c = CONFIGS[link.dataset.config];
+          if (!c) return;
+          e.preventDefault();
+          const subject = "Commande — Config " + c.name + " (" + c.price + ")";
+          const body =
+            "Bonjour M26 INFORMATIQUE,\n\n" +
+            "Je souhaite commander la configuration " + c.name + " (" + c.price + ") :\n" +
+            c.specs.map((s) => "- " + s).join("\n") +
+            "\n\nMes coordonnées :\nNom :\nPrénom :\nTéléphone :\nAdresse de livraison :\n\n" +
+            "Remarques éventuelles (personnalisation, délais, etc.) :\n\nMerci !";
+          window.location.href =
+            "mailto:m26.informatique@gmail.com?subject=" +
+            encodeURIComponent(subject) +
+            "&body=" +
+            encodeURIComponent(body);
+        });
+      });
     </script>
   </body>
 </html>
