@@ -46,13 +46,15 @@ jobs:
         run: |
           cd .output/public
           echo "=== output tree ==="; find . -type f -exec ls -l {} \; | sort -k9
-          # SPA mode emits the client-rendered shell; normalize whatever it is
-          # called (index, _shell.html, ...) into index.html for GitHub Pages.
-          if [ ! -f index.html ]; then
-            if [ -f index ]; then mv index index.html;
-            elif [ -f _shell.html ]; then cp _shell.html index.html; fi
+          # The page is prerendered under the sub-path dir; hoist it to root so
+          # GitHub Pages serves it at https://<user>.github.io/site-montage-pc/.
+          if [ -f site-montage-pc/index.html ]; then
+            mv -f site-montage-pc/index.html index.html
+            rm -rf site-montage-pc
+          elif [ ! -f index.html ] && [ -f index ]; then
+            mv index index.html
           fi
-          # Fail loudly (with a non-empty check) if no usable shell was produced.
+          # Fail loudly (with a non-empty check) if no usable page was produced.
           test -s index.html
           # SPA-style fallback so deep links / refreshes don't 404.
           cp index.html 404.html

@@ -17,17 +17,18 @@ export default defineConfig({
     base: BASE,
   },
   // Force-enable the Nitro build outside the Lovable environment and target
-  // GitHub Pages (static output in .output/public, with .nojekyll + 404.html).
-  // baseURL keeps Nitro's prerenderer requesting routes under the sub-path so
-  // they match the router's basepath instead of 404-ing.
-  nitro: { preset: "github_pages", baseURL: BASE },
+  // GitHub Pages (static output in .output/public).
+  // Prerender the sub-path route directly: the router has basepath BASE, so
+  // requesting BASE matches the index route and renders real HTML. (Requesting
+  // "/" would mismatch the basepath and render an empty page.) The file lands
+  // under .output/public/site-montage-pc/ and the workflow hoists it to root.
+  nitro: {
+    preset: "github_pages",
+    prerender: { routes: [BASE], crawlLinks: false },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-    // SPA mode: emit a static client-rendered shell (index.html) instead of
-    // per-route SSR. Required for static hosting like GitHub Pages, and avoids
-    // the empty-output that route prerendering produced under the sub-path.
-    spa: { enabled: true },
   },
 });
