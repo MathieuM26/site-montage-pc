@@ -18,12 +18,13 @@ export default defineConfig({
   },
   // Force-enable the Nitro build outside the Lovable environment and target
   // GitHub Pages (static output in .output/public).
-  // Prerender the sub-path route directly: the router has basepath BASE, so
-  // requesting BASE matches the index route and renders real HTML. (Requesting
-  // "/" would mismatch the basepath and render an empty page.) The file lands
-  // under .output/public/site-montage-pc/ and the workflow hoists it to root.
+  // Nitro mounts the app AT baseURL and redirects everything else to it, so we
+  // must prerender the baseURL path itself (requesting "/" only yields an empty
+  // redirect body). With the request hitting BASE, the router (basepath BASE)
+  // matches the index route and renders real HTML to .output/public/index.
   nitro: {
     preset: "github_pages",
+    baseURL: BASE,
     prerender: { routes: [BASE], crawlLinks: false },
   },
   // NOTE: intentionally NOT overriding tanstackStart.server.entry. Lovable's
